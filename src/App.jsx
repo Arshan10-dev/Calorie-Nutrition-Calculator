@@ -37,3 +37,4 @@ const PAGES = {
   charts: ChartsPage,
   goals: GoalsPage,
 };
+export default function Dashboard(){}
