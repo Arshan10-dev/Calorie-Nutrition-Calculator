@@ -38,16 +38,9 @@ const PAGES = {
   goals: GoalsPage,
 };
 export default function App() {
-  const { activeView } = useUser();
-  const PageComponent = PAGES[activeView] || Dashboard;
-
   return (
-    <MainLayout>
-      <AnimatePresence mode="wait">
-        <PageWrapper key={activeView}>
-          <PageComponent />
-        </PageWrapper>
-      </AnimatePresence>
-    </MainLayout>
+    <div>
+      APP WORKING ✅
+    </div>
   );
 }
