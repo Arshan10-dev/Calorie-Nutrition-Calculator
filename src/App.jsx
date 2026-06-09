@@ -18,6 +18,7 @@ import GoalsPage from './pages/GoalsPage';
 // Page transition wrapper
 const PageWrapper = ({ children }) => (
   <motion.div
+    key="page"
     initial={{ opacity: 0, y: 12 }}
     animate={{ opacity: 1, y: 0 }}
     exit={{ opacity: 0, y: -8 }}
@@ -37,10 +38,18 @@ const PAGES = {
   charts: ChartsPage,
   goals: GoalsPage,
 };
-export default function App() {
+
+export default function Dashboard() {
+  const { activeView } = useUser();
+  const PageComponent = PAGES[activeView] || Dashboard;
+
   return (
-    <div>
-      APP WORKING ✅
-    </div>
+    <MainLayout>
+      <AnimatePresence mode="wait">
+        <PageWrapper key={activeView}>
+          <PageComponent />
+        </PageWrapper>
+      </AnimatePresence>
+    </MainLayout>
   );
 }
