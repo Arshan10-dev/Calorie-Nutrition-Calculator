@@ -18,7 +18,6 @@ import GoalsPage from './pages/GoalsPage';
 // Page transition wrapper
 const PageWrapper = ({ children }) => (
   <motion.div
-    key="page"
     initial={{ opacity: 0, y: 12 }}
     animate={{ opacity: 1, y: 0 }}
     exit={{ opacity: 0, y: -8 }}
