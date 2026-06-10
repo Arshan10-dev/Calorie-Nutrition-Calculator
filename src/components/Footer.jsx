@@ -18,8 +18,7 @@ export default function Footer() {
           </div>
 
           <p className="text-gray-500 dark:text-gray-400 text-xs leading-relaxed">
-            Smart Nutrition Intelligence Platform for calorie tracking,
-            macro planning and health insights.
+            Nutrition Intelligence Platform
           </p>
         </div>
 
