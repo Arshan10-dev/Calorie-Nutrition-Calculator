@@ -1,5 +1,4 @@
 // src/pages/Dashboard.jsx
-import { motion } from 'framer-motion';
 import DashboardHeader from '../components/DashboardHeader';
 import StatsGrid from '../components/StatsGrid';
 import BMICard from '../components/BMICard';
@@ -27,19 +26,13 @@ function ChartCard({ title, subtitle, children }) {
 
 function EmptyState({ onNavigate }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="text-center py-16"
-    >
+    <div className="text-center py-16">
       <div className="w-16 h-16 rounded-2xl bg-brand-100 dark:bg-brand-900/30 flex items-center justify-center mx-auto mb-4">
         <span className="text-3xl">🥦</span>
       </div>
-      <h3 className="text-lg font-display font-bold text-gray-900 dark:text-white mb-2">
-        Welcome to NutriIQ
-      </h3>
+      <h3 className="text-lg font-display font-bold text-gray-900 dark:text-white mb-2">Welcome to NutriIQ</h3>
       <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 max-w-xs mx-auto">
-        Fill in your profile details to unlock personalized nutrition insights and calorie targets.
+        Fill in your profile details to unlock personalised nutrition insights and calorie targets.
       </p>
       <button
         onClick={() => onNavigate('profile')}
@@ -47,17 +40,15 @@ function EmptyState({ onNavigate }) {
       >
         Set Up Profile →
       </button>
-    </motion.div>
+    </div>
   );
 }
 
 export default function Dashboard() {
-  const { isValid } = useCalorieCalculator();
+  const { isValid }      = useCalorieCalculator();
   const { setActiveView } = useNav();
 
-  if (!isValid) {
-    return <EmptyState onNavigate={setActiveView} />;
-  }
+  if (!isValid) return <EmptyState onNavigate={setActiveView} />;
 
   return (
     <div className="space-y-6">

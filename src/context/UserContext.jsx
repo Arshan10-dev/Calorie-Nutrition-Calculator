@@ -1,14 +1,9 @@
 // src/context/UserContext.jsx
-// Global user profile & theme state — persisted to localStorage
-// 
-// FIX: activeView and sidebarOpen are now kept in a separate NavigationContext
-// so that navigating between pages does NOT trigger a profile context re-render,
-// which was causing useCalorieCalculator to see a stale/empty profile briefly.
-
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
-// ── User / Profile context ─────────────────────────────────────────────────
+// ── Two separate contexts so nav changes never re-render profile consumers ──
 const UserContext = createContext(null);
+const NavContext  = createContext(null);
 
 const DEFAULT_PROFILE = {
   name: '',
@@ -22,48 +17,47 @@ const DEFAULT_PROFILE = {
 };
 
 const LS_PROFILE_KEY = 'nutriiq_profile';
-const LS_THEME_KEY = 'nutriiq_theme';
+const LS_THEME_KEY   = 'nutriiq_theme';
 
-// ── Navigation context (separate to avoid cross-contamination) ─────────────
-const NavContext = createContext(null);
+function readProfile() {
+  try {
+    const raw = localStorage.getItem(LS_PROFILE_KEY);
+    return raw ? { ...DEFAULT_PROFILE, ...JSON.parse(raw) } : DEFAULT_PROFILE;
+  } catch {
+    return DEFAULT_PROFILE;
+  }
+}
+
+function readDark() {
+  try {
+    const saved = localStorage.getItem(LS_THEME_KEY);
+    if (saved !== null) return saved === 'dark';
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  } catch {
+    return false;
+  }
+}
 
 export function UserProvider({ children }) {
-  // ── Theme ────────────────────────────────────────────────────────────────
-  const [darkMode, setDarkMode] = useState(() => {
-    try {
-      const saved = localStorage.getItem(LS_THEME_KEY);
-      if (saved !== null) return saved === 'dark';
-      return window.matchMedia('(prefers-color-scheme: dark)').matches;
-    } catch {
-      return false;
-    }
-  });
+  // ── Dark mode ────────────────────────────────────────────────────────────
+  const [darkMode, setDarkMode] = useState(readDark);
 
   useEffect(() => {
-    const root = document.documentElement;
-    darkMode ? root.classList.add('dark') : root.classList.remove('dark');
+    document.documentElement.classList.toggle('dark', darkMode);
     localStorage.setItem(LS_THEME_KEY, darkMode ? 'dark' : 'light');
   }, [darkMode]);
 
-  const toggleDarkMode = useCallback(() => setDarkMode((p) => !p), []);
+  const toggleDarkMode = useCallback(() => setDarkMode(p => !p), []);
 
   // ── Profile ──────────────────────────────────────────────────────────────
-  const [profile, setProfile] = useState(() => {
-    try {
-      const saved = localStorage.getItem(LS_PROFILE_KEY);
-      return saved ? { ...DEFAULT_PROFILE, ...JSON.parse(saved) } : DEFAULT_PROFILE;
-    } catch {
-      return DEFAULT_PROFILE;
-    }
-  });
+  const [profile, setProfile] = useState(readProfile);
 
-  // Write to localStorage whenever profile changes
   useEffect(() => {
     localStorage.setItem(LS_PROFILE_KEY, JSON.stringify(profile));
   }, [profile]);
 
   const updateProfile = useCallback((updates) => {
-    setProfile((prev) => ({ ...prev, ...updates }));
+    setProfile(prev => ({ ...prev, ...updates }));
   }, []);
 
   const resetProfile = useCallback(() => {
@@ -71,24 +65,12 @@ export function UserProvider({ children }) {
     localStorage.removeItem(LS_PROFILE_KEY);
   }, []);
 
-  // ── Navigation (separate state — does NOT live inside UserContext) ────────
-  const [activeView, setActiveView] = useState('dashboard');
+  // ── Navigation (completely separate — won't disturb profile renders) ─────
+  const [activeView,  setActiveView]  = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const userValue = {
-    darkMode,
-    toggleDarkMode,
-    profile,
-    updateProfile,
-    resetProfile,
-  };
-
-  const navValue = {
-    activeView,
-    setActiveView,
-    sidebarOpen,
-    setSidebarOpen,
-  };
+  const userValue = { darkMode, toggleDarkMode, profile, updateProfile, resetProfile };
+  const navValue  = { activeView, setActiveView, sidebarOpen, setSidebarOpen };
 
   return (
     <UserContext.Provider value={userValue}>
@@ -99,15 +81,14 @@ export function UserProvider({ children }) {
   );
 }
 
-// ── Hooks ────────────────────────────────────────────────────────────────────
 export function useUser() {
   const ctx = useContext(UserContext);
-  if (!ctx) throw new Error('useUser must be used inside <UserProvider>');
+  if (!ctx) throw new Error('useUser must be inside <UserProvider>');
   return ctx;
 }
 
 export function useNav() {
   const ctx = useContext(NavContext);
-  if (!ctx) throw new Error('useNav must be used inside <UserProvider>');
+  if (!ctx) throw new Error('useNav must be inside <UserProvider>');
   return ctx;
 }

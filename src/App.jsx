@@ -1,5 +1,4 @@
 // src/App.jsx
-import { AnimatePresence, motion } from 'framer-motion';
 import { useNav } from './context/UserContext';
 import MainLayout from './layouts/MainLayout';
 
@@ -23,23 +22,14 @@ const PAGES = {
   goals: GoalsPage,
 };
 
+// NO AnimatePresence — simple conditional render, zero blank screen risk
 export default function App() {
   const { activeView } = useNav();
   const PageComponent = PAGES[activeView] || Dashboard;
 
   return (
     <MainLayout>
-      <AnimatePresence mode="wait" initial={false}>
-        <motion.div
-          key={activeView}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -6 }}
-          transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <PageComponent />
-        </motion.div>
-      </AnimatePresence>
+      <PageComponent key={activeView} />
     </MainLayout>
   );
 }
