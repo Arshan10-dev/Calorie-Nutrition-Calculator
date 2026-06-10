@@ -4,17 +4,17 @@ import {
   LayoutDashboard, User, Activity, Flame, Droplets,
   BarChart3, Target, X, Zap
 } from 'lucide-react';
-import { useUser } from '../context/UserContext';
+import { useNav } from '../context/UserContext';
 
 const NAV_ITEMS = [
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { id: 'profile', label: 'My Profile', icon: User },
-  { id: 'calories', label: 'Calories', icon: Flame },
-  { id: 'macros', label: 'Macros', icon: Activity },
-  { id: 'hydration', label: 'Hydration', icon: Droplets },
-  { id: 'burn', label: 'Burn Estimator', icon: Zap },
-  { id: 'charts', label: 'Charts', icon: BarChart3 },
-  { id: 'goals', label: 'Goals', icon: Target },
+  { id: 'dashboard',  label: 'Dashboard',     icon: LayoutDashboard },
+  { id: 'profile',    label: 'My Profile',    icon: User },
+  { id: 'calories',   label: 'Calories',      icon: Flame },
+  { id: 'macros',     label: 'Macros',        icon: Activity },
+  { id: 'hydration',  label: 'Hydration',     icon: Droplets },
+  { id: 'burn',       label: 'Burn Estimator',icon: Zap },
+  { id: 'charts',     label: 'Charts',        icon: BarChart3 },
+  { id: 'goals',      label: 'Goals',         icon: Target },
 ];
 
 function NavItem({ item, active, onClick }) {
@@ -40,9 +40,8 @@ function NavItem({ item, active, onClick }) {
   );
 }
 
-// Desktop sidebar (always visible ≥ md)
 export function DesktopSidebar() {
-  const { activeView, setActiveView } = useUser();
+  const { activeView, setActiveView } = useNav();
 
   return (
     <aside className="hidden md:flex flex-col w-60 h-full bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl border-r border-gray-200/60 dark:border-gray-800/60 pt-16">
@@ -56,8 +55,6 @@ export function DesktopSidebar() {
           />
         ))}
       </div>
-
-      {/* Footer */}
       <div className="px-4 py-4 border-t border-gray-200/60 dark:border-gray-800/60">
         <p className="text-xs text-gray-400 dark:text-gray-600 text-center">
           NutriIQ v1.0 · Built for health
@@ -67,15 +64,13 @@ export function DesktopSidebar() {
   );
 }
 
-// Mobile drawer sidebar
 export function MobileSidebar() {
-  const { activeView, setActiveView, sidebarOpen, setSidebarOpen } = useUser();
+  const { activeView, setActiveView, sidebarOpen, setSidebarOpen } = useNav();
 
   return (
     <AnimatePresence>
       {sidebarOpen && (
         <>
-          {/* Backdrop */}
           <motion.div
             key="backdrop"
             initial={{ opacity: 0 }}
@@ -84,8 +79,6 @@ export function MobileSidebar() {
             onClick={() => setSidebarOpen(false)}
             className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm md:hidden"
           />
-
-          {/* Drawer */}
           <motion.aside
             key="drawer"
             initial={{ x: -280 }}
@@ -94,7 +87,6 @@ export function MobileSidebar() {
             transition={{ type: 'spring', damping: 28, stiffness: 280 }}
             className="fixed top-0 left-0 bottom-0 z-50 w-72 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col md:hidden"
           >
-            {/* Drawer header */}
             <div className="flex items-center justify-between px-4 h-16 border-b border-gray-200 dark:border-gray-800">
               <div className="flex items-center gap-2.5">
                 <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-brand-400 to-emerald-600 flex items-center justify-center">
@@ -111,8 +103,6 @@ export function MobileSidebar() {
                 <X size={18} />
               </button>
             </div>
-
-            {/* Nav */}
             <div className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
               {NAV_ITEMS.map((item) => (
                 <NavItem

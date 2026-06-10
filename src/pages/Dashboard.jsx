@@ -11,7 +11,7 @@ import MacroPieChart from '../charts/MacroPieChart';
 import CalorieComparisonChart from '../charts/CalorieComparisonChart';
 import WeightProgressChart from '../charts/WeightProgressChart';
 import { useCalorieCalculator } from '../hooks/useCalorieCalculator';
-import { useUser } from '../context/UserContext';
+import { useNav } from '../context/UserContext';
 
 function ChartCard({ title, subtitle, children }) {
   return (
@@ -53,7 +53,7 @@ function EmptyState({ onNavigate }) {
 
 export default function Dashboard() {
   const { isValid } = useCalorieCalculator();
-  const { setActiveView } = useUser();
+  const { setActiveView } = useNav();
 
   if (!isValid) {
     return <EmptyState onNavigate={setActiveView} />;
@@ -61,26 +61,17 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      {/* Hero header */}
       <DashboardHeader />
-
-      {/* Quick stats row */}
       <StatsGrid />
-
-      {/* Main grid: 3 cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
         <BMICard />
         <CalorieCard />
         <MacroCard />
       </div>
-
-      {/* Water + Burn row */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <WaterCard />
         <BurnEstimator />
       </div>
-
-      {/* Charts row */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
         <ChartCard title="Macro Split" subtitle="By your daily calorie goal">
           <MacroPieChart />

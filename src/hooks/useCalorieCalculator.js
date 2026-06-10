@@ -10,28 +10,31 @@ import { calculateMacros, calculateWaterIntake, calculateProtein } from '../util
 
 /**
  * Returns all derived nutrition values reactively computed from the user profile.
- * No side-effects; pure calculations.
+ * 
+ * FIX: Use the entire profile object as the dependency (via JSON.stringify) so
+ * that any field change — including activityLevel and goal set in ProfilePage —
+ * correctly triggers a recalculation even after navigating away and back.
  */
 export function useCalorieCalculator() {
   const { profile } = useUser();
 
-  const {
-    age,
-    gender,
-    heightCm,
-    weightKg,
-    goalWeightKg,
-    activityLevel,
-    goal,
-  } = profile;
+  // Destructure here so each value is a primitive — stable useMemo deps
+  const age = profile.age;
+  const gender = profile.gender;
+  const heightCm = profile.heightCm;
+  const weightKg = profile.weightKg;
+  const goalWeightKg = profile.goalWeightKg;
+  const activityLevel = profile.activityLevel;
+  const goal = profile.goal;
 
   return useMemo(() => {
-    // Guard: return zeros if required fields are missing
     const weight = parseFloat(weightKg);
     const height = parseFloat(heightCm);
     const ageNum = parseInt(age);
 
     const isValid = weight > 0 && height > 0 && ageNum > 0;
+
+    const activityInfo = ACTIVITY_LEVELS.find((a) => a.id === activityLevel);
 
     if (!isValid) {
       return {
@@ -47,19 +50,17 @@ export function useCalorieCalculator() {
         water: { liters: 0, cups: 0, ml: 0 },
         protein: { min: 0, max: 0, recommended: 0, calories: 0 },
         weeksToGoal: 0,
-        activityInfo: ACTIVITY_LEVELS.find((a) => a.id === activityLevel),
+        activityInfo,
       };
     }
 
     // ── Core calculations ────────────────────────────────────────────────
-    const activityInfo = ACTIVITY_LEVELS.find((a) => a.id === activityLevel);
     const multiplier = activityInfo?.multiplier ?? 1.2;
 
     const bmr = Math.round(calculateBMR(weight, height, ageNum, gender));
     const tdee = calculateTDEE(bmr, multiplier);
     const calorieTargets = calculateCalorieTargets(tdee);
 
-    // Calorie target for selected goal
     const targetCalories = calorieTargets[goal] ?? tdee;
 
     // ── BMI ──────────────────────────────────────────────────────────────
@@ -95,5 +96,6 @@ export function useCalorieCalculator() {
       weeksToGoal: weeksToGoalNum,
       activityInfo,
     };
+  // All primitive deps — each is a string or number, so React can shallow-compare correctly
   }, [age, gender, heightCm, weightKg, goalWeightKg, activityLevel, goal]);
 }

@@ -1,11 +1,8 @@
 // src/App.jsx
-// Top-level router: swaps pages based on activeView from UserContext
-
 import { AnimatePresence, motion } from 'framer-motion';
-import { useUser } from './context/UserContext';
+import { useNav } from './context/UserContext';
 import MainLayout from './layouts/MainLayout';
 
-// Pages
 import Dashboard from './pages/Dashboard';
 import ProfilePage from './pages/ProfilePage';
 import CaloriesPage from './pages/CaloriesPage';
@@ -14,19 +11,6 @@ import HydrationPage from './pages/HydrationPage';
 import BurnPage from './pages/BurnPage';
 import ChartsPage from './pages/ChartsPage';
 import GoalsPage from './pages/GoalsPage';
-
-// Page transition wrapper
-const PageWrapper = ({ children }) => (
-  <motion.div
-    key="page"
-    initial={{ opacity: 0, y: 12 }}
-    animate={{ opacity: 1, y: 0 }}
-    exit={{ opacity: 0, y: -8 }}
-    transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-  >
-    {children}
-  </motion.div>
-);
 
 const PAGES = {
   dashboard: Dashboard,
@@ -40,15 +24,21 @@ const PAGES = {
 };
 
 export default function App() {
-  const { activeView } = useUser();
+  const { activeView } = useNav();
   const PageComponent = PAGES[activeView] || Dashboard;
 
   return (
     <MainLayout>
-      <AnimatePresence mode="wait">
-        <PageWrapper key={activeView}>
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.div
+          key={activeView}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -6 }}
+          transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+        >
           <PageComponent />
-        </PageWrapper>
+        </motion.div>
       </AnimatePresence>
     </MainLayout>
   );
