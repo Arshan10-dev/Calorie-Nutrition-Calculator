@@ -50,7 +50,7 @@ export function useCalorieCalculator() {
     const bmi           = calculateBMI(weight, height);
     const bmiCategory   = getBMICategory(bmi);
     const idealWeight   = idealWeightRange(height);
-    const macros        = calculateMacros(targetCalories, goal);
+    const macros        = calculateMacros(targetCalories, goal, weight);
     const water         = calculateWaterIntake(weight, activityLevel);
     const protein       = calculateProtein(weight, goal);
     const gw            = parseFloat(goalWeightKg);

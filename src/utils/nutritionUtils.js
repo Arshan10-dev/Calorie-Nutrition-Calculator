@@ -36,36 +36,54 @@ export function calculateProtein(weightKg, goal) {
  * @param {string} goal - 'lose' | 'maintain' | 'gain'
  * @returns {{ protein: { grams, calories, percent }, fat: {...}, carbs: {...} }}
  */
-export function calculateMacros(totalCalories, goal) {
-  if (!totalCalories) return null;
+export function calculateMacros(totalCalories, goal, weightKg) {
+  if (!totalCalories || !weightKg) return null;
 
-  const splits = {
-    lose: { protein: 0.30, fat: 0.30, carbs: 0.40 },
-    maintain: { protein: 0.25, fat: 0.30, carbs: 0.45 },
-    gain: { protein: 0.25, fat: 0.25, carbs: 0.50 },
+  // Protein based on bodyweight
+  const proteinData = calculateProtein(weightKg, goal);
+  const proteinGrams = proteinData.recommended;
+  const proteinCalories = proteinGrams * 4;
+
+  // Fat percentages by goal
+  const fatPercentages = {
+    lose: 0.30,
+    maintain: 0.30,
+    gain: 0.25,
   };
 
-  const split = splits[goal] || splits.maintain;
+  const fatPercent = fatPercentages[goal] || 0.30;
+  const fatCalories = totalCalories * fatPercent;
+  const fatGrams = fatCalories / 9;
 
-  const proteinCals = totalCalories * split.protein;
-  const fatCals = totalCalories * split.fat;
-  const carbCals = totalCalories * split.carbs;
+  // Remaining calories go to carbs
+  const carbCalories =
+    totalCalories - proteinCalories - fatCalories;
+
+  const carbGrams = carbCalories / 4;
 
   return {
     protein: {
-      grams: Math.round(proteinCals / 4),
-      calories: Math.round(proteinCals),
-      percent: Math.round(split.protein * 100),
+      grams: Math.round(proteinGrams),
+      calories: Math.round(proteinCalories),
+      percent: Math.round(
+        (proteinCalories / totalCalories) * 100
+      ),
     },
+
     fat: {
-      grams: Math.round(fatCals / 9),
-      calories: Math.round(fatCals),
-      percent: Math.round(split.fat * 100),
+      grams: Math.round(fatGrams),
+      calories: Math.round(fatCalories),
+      percent: Math.round(
+        (fatCalories / totalCalories) * 100
+      ),
     },
+
     carbs: {
-      grams: Math.round(carbCals / 4),
-      calories: Math.round(carbCals),
-      percent: Math.round(split.carbs * 100),
+      grams: Math.round(carbGrams),
+      calories: Math.round(carbCalories),
+      percent: Math.round(
+        (carbCalories / totalCalories) * 100
+      ),
     },
   };
 }
