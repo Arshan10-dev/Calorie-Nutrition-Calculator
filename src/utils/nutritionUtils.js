@@ -101,14 +101,14 @@ export function calculateWaterIntake(weightKg, activityLevel) {
   if (!weightKg) return { liters: 0, cups: 0, ml: 0 };
 
   const activityBonus = {
-    sedentary: 0,
-    light: 300,
-    moderate: 500,
-    active: 700,
-    athlete: 1000,
-  };
+  sedentary: 0,
+  light: 400,
+  moderate: 700,
+  active: 1000,
+  athlete: 1500,
+};
 
-  const baseMl = weightKg * 35;
+  const baseMl = weightKg * 40;
   const bonus = activityBonus[activityLevel] || 0;
   const totalMl = baseMl + bonus;
 
